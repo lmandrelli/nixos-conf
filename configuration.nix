@@ -132,6 +132,21 @@
         "flakes"       # Système de flakes pour la reproductibilité
       ];
       auto-optimise-store = true; # Optimisation automatique du store
+      
+      # Configuration des caches binaires (plus sécurisé en premier)
+      substituters = [
+        "https://cache.nixos.org/"        # Cache officiel NixOS (plus sécurisé)
+        "https://nix-community.cachix.org" # Cache communautaire Nix
+      ];
+      
+      # Clés publiques de confiance pour vérification des signatures
+      trusted-public-keys = [
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="           # Cache officiel NixOS
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" # Cache communautaire
+      ];
+      
+      # Sécurité: Vérification obligatoire des signatures
+      require-sigs = true;
     };
     
     # Nettoyage automatique des générations anciennes
@@ -188,6 +203,9 @@
     # Outils système essentiels
     wget curl git vim nano
     htop tree file
+    
+    # Cache binaire
+    cachix
     
     # Support pour les formats d'archive
     unzip zip p7zip
