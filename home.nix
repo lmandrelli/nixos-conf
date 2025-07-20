@@ -159,8 +159,6 @@
       "result"
       "result-*"
       ".direnv/"
-      ".pre-commit-config.yaml"
-      "flake.lock"
 
       # Zed
       ".zed/"
