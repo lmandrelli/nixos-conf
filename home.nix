@@ -41,7 +41,7 @@
     
     # === ÉDITEURS ET IDE ===
     # Visual Studio Code - éditeur populaire avec extensions
-    vscode-fhs # Version avec support FHS pour une meilleure compatibilité
+    vscode # Version standard (pas FHS)
     
     # Zed - éditeur moderne écrit en Rust
     zed-editor
