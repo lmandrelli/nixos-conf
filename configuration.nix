@@ -49,7 +49,7 @@
   console.keyMap = "fr";
 
   # === CONFIGURATION GRAPHIQUE ===
-  # Activation de l'environnement graphique avec support Wayland
+  # Activation de l'environnement graphique avec support Wayland et XWayland
   services.xserver = {
     enable = true;
     # Clavier français pour X11/Wayland
@@ -58,6 +58,9 @@
       variant = "";
     };
   };
+  
+  # XWayland support pour GNOME
+  programs.xwayland.enable = true;
 
   # GNOME Display Manager (GDM) pour l'écran de connexion
   services.displayManager.gdm.enable = true;
@@ -213,11 +216,18 @@
     xwayland.enable = true;
   };
 
-  # Variables d'environnement pour Hyprland
+  # Variables d'environnement pour Wayland et XWayland
   environment.sessionVariables = {
     # Support Wayland pour les applications
     NIXOS_OZONE_WL = "1";
     WLR_NO_HARDWARE_CURSORS = "1"; # Correctif pour certaines cartes graphiques
+    
+    # XWayland et GNOME Wayland compatibility
+    GDK_BACKEND = "wayland,x11";
+    QT_QPA_PLATFORM = "wayland;xcb";
+    CLUTTER_BACKEND = "wayland";
+    XDG_SESSION_TYPE = "wayland";
+    MOZ_ENABLE_WAYLAND = "1";
   };
 
   # === PACKAGES SYSTÈME ===
@@ -236,9 +246,13 @@
     # Outils de développement de base
     gcc gnumake cmake
     
-    # Outils Wayland
+    # Outils Wayland et XWayland
     wl-clipboard
     xdg-utils
+    xwayland
+    xorg.xhost
+    xorg.xauth
+    xorg.xrandr
     
     # Outils pour Hyprland
     waybar          # Barre de status
