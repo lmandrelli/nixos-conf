@@ -15,6 +15,12 @@
     systemd-boot.enable = true;
     efi.canTouchEfiVariables = true;
   };
+  
+  # Paramètres kernel pour NVIDIA Wayland
+  boot.kernelParams = [
+    "nvidia-drm.modeset=1"
+    "nvidia-drm.fbdev=1"
+  ];
 
   # === CONFIGURATION RÉSEAU ===
   networking = {
@@ -99,8 +105,12 @@
     # Activation du support Wayland pour NVIDIA
     modesetting.enable = true;
     
-    # Support de la gestion d'énergie
-    powerManagement.enable = true;
+    # Support de la gestion d'énergie (désactivé pour éviter les problèmes Wayland)
+    powerManagement.enable = false;
+    powerManagement.finegrained = false;
+    
+    # Menu des paramètres NVIDIA
+    nvidiaSettings = true;
     
     # Utilisation du driver stable le plus récent
     package = config.boot.kernelPackages.nvidiaPackages.stable;
@@ -110,6 +120,13 @@
   hardware.graphics = {
     enable = true;
     enable32Bit = true; # Support 32-bit pour Steam/Proton
+    
+    # Drivers VAAPI pour accélération vidéo NVIDIA Wayland
+    extraPackages = with pkgs; [
+      nvidia-vaapi-driver
+      vaapiVdpau
+      libvdpau-va-gl
+    ];
   };
 
   # === CONFIGURATION PROCESSEUR INTEL ===
@@ -216,17 +233,16 @@
     xwayland.enable = true;
   };
 
-  # Variables d'environnement pour Wayland et XWayland
+  # Variables d'environnement pour Wayland et NVIDIA
   environment.sessionVariables = {
-    # Support Wayland pour les applications
+    # Support Wayland pour les applications Chromium/Electron
     NIXOS_OZONE_WL = "1";
-    WLR_NO_HARDWARE_CURSORS = "1"; # Correctif pour certaines cartes graphiques
     
-    # XWayland et GNOME Wayland compatibility
-    GDK_BACKEND = "wayland,x11";
-    QT_QPA_PLATFORM = "wayland;xcb";
-    CLUTTER_BACKEND = "wayland";
-    XDG_SESSION_TYPE = "wayland";
+    # Variables NVIDIA Wayland
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    
+    # Support Wayland natif pour Firefox
     MOZ_ENABLE_WAYLAND = "1";
   };
 
@@ -253,6 +269,10 @@
     xorg.xhost
     xorg.xauth
     xorg.xrandr
+    
+    # Support NVIDIA Wayland
+    nvidia-vaapi-driver
+    egl-wayland
     
     # Outils pour Hyprland
     waybar          # Barre de status
