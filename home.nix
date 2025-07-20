@@ -625,7 +625,7 @@
   # Les serveurs MCP sont configurés via settings.json et recréés automatiquement
   
   # Configuration MCP persistante dans settings.json
-  home.file.".config/claude/settings.json".text = builtins.toJSON {
+  home.file.".claude/settings.json".text = builtins.toJSON {
     mcpServers = {
       # === SERVEURS OFFICIELS ===
       
