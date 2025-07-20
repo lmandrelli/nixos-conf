@@ -21,6 +21,8 @@
     # Bridge X11 vers Wayland pour KDE Plasma
     xdg-desktop-portal-wlr
     xdg-desktop-portal-gtk
+    # Num Lock control
+    numlockx
     # === POLICES ===
     jetbrains-mono nerd-fonts.jetbrains-mono nerd-fonts.meslo-lg
 
@@ -601,6 +603,22 @@
 
   # Permet à Home Manager de gérer lui-même ses services
   programs.home-manager.enable = true;
+
+  # === CONFIGURATION NUM LOCK PLASMA ===
+  # Service pour activer Num Lock au démarrage de la session KDE
+  systemd.user.services.numlock = {
+    Unit = {
+      Description = "Enable NumLock at startup";
+      After = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.numlockx}/bin/numlockx on";
+    };
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
+  };
 
   # === CONFIGURATION CLAUDE CODE MCP ===
   # Configuration persistante des serveurs MCP pour Claude Code

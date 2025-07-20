@@ -78,6 +78,15 @@
   # Session par défaut : KDE Plasma Wayland
   services.displayManager.defaultSession = "plasma";
   
+  # === CONFIGURATION NUM LOCK ===
+  # Activation du Num Lock pour GDM (écran de connexion)
+  programs.dconf.profiles.gdm.databases = [{
+    settings."org/gnome/desktop/peripherals/keyboard" = {
+      numlock-state = true;
+      remember-numlock-state = true;
+    };
+  }];
+  
   # === CONFIGURATION AUDIO ===
   # PipeWire pour l'audio moderne avec support Wayland
   # CORRECTION: Utilisation de services.pulseaudio au lieu de hardware.pulseaudio
