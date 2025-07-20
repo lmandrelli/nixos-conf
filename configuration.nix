@@ -65,21 +65,18 @@
     };
   };
   
-  # XWayland support pour GNOME
+  # XWayland support pour KDE Plasma
   programs.xwayland.enable = true;
 
-  # GNOME Display Manager (GDM) pour l'écran de connexion
+  # GDM Display Manager pour l'écran de connexion
   services.displayManager.gdm.enable = true;
   services.displayManager.gdm.wayland = true;
   
-  # GNOME (uniquement pour l'écran de connexion, pas comme environnement de bureau)
-  services.desktopManager.gnome.enable = true;
-  
-  # KDE Plasma avec Wayland (gardé pour compatibilité)
+  # KDE Plasma 6 avec Wayland
   services.desktopManager.plasma6.enable = true;
   
-  # Session par défaut : GNOME Wayland
-  services.displayManager.defaultSession = "gnome";
+  # Session par défaut : KDE Plasma Wayland
+  services.displayManager.defaultSession = "plasma";
   
   # === CONFIGURATION AUDIO ===
   # PipeWire pour l'audio moderne avec support Wayland
@@ -120,13 +117,6 @@
   hardware.graphics = {
     enable = true;
     enable32Bit = true; # Support 32-bit pour Steam/Proton
-    
-    # Drivers VAAPI pour accélération vidéo NVIDIA Wayland
-    extraPackages = with pkgs; [
-      nvidia-vaapi-driver
-      vaapiVdpau
-      libvdpau-va-gl
-    ];
   };
 
   # === CONFIGURATION PROCESSEUR INTEL ===
@@ -233,17 +223,10 @@
     xwayland.enable = true;
   };
 
-  # Variables d'environnement pour Wayland et NVIDIA
+  # Variables d'environnement essentielles pour KDE Plasma Wayland
   environment.sessionVariables = {
     # Support Wayland pour les applications Chromium/Electron
     NIXOS_OZONE_WL = "1";
-    
-    # Variables NVIDIA Wayland
-    GBM_BACKEND = "nvidia-drm";
-    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    
-    # Support Wayland natif pour Firefox
-    MOZ_ENABLE_WAYLAND = "1";
   };
 
   # === PACKAGES SYSTÈME ===
@@ -266,13 +249,6 @@
     wl-clipboard
     xdg-utils
     xwayland
-    xorg.xhost
-    xorg.xauth
-    xorg.xrandr
-    
-    # Support NVIDIA Wayland
-    nvidia-vaapi-driver
-    egl-wayland
     
     # Outils pour Hyprland
     waybar          # Barre de status
@@ -314,7 +290,7 @@
   # === CONFIGURATION SUDO ===
   security.sudo.enable = true;
   
-  # === RÉSOLUTION CONFLIT SSH ASKPASS ===
-  # Force l'utilisation de l'askpass GNOME pour éviter le conflit avec KDE
-  programs.ssh.askPassword = lib.mkForce "${pkgs.seahorse}/libexec/seahorse/ssh-askpass";
+  # === CONFIGURATION SSH ASKPASS ===
+  # Utilise l'askpass KDE pour une meilleure intégration
+  programs.ssh.askPassword = lib.mkForce "${pkgs.kdePackages.ksshaskpass}/bin/ksshaskpass";
 }

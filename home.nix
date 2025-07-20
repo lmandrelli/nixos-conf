@@ -18,7 +18,7 @@
   home.packages = with pkgs; [
     # === COMPATIBILITÉ WAYLAND/X11 ===
     xwayland xorg.xhost
-    # Bridge X11 vers Wayland pour GNOME
+    # Bridge X11 vers Wayland pour KDE Plasma
     xdg-desktop-portal-wlr
     xdg-desktop-portal-gtk
     # === POLICES ===
@@ -539,27 +539,27 @@
     };
   };
 
-  # === CONFIGURATION GTK ===
+  # === CONFIGURATION GTK (pour compatibilité KDE) ===
   gtk = {
     enable = true;
     
     theme = {
-      name = "Adwaita-dark";
-      package = pkgs.gnome-themes-extra;
+      name = "Breeze-Dark";
+      package = pkgs.kdePackages.breeze-gtk;
     };
     
     iconTheme = {
-      name = "Adwaita";
-      package = pkgs.adwaita-icon-theme;
+      name = "breeze-dark";
+      package = pkgs.kdePackages.breeze-icons;
     };
     
     cursorTheme = {
-      name = "Adwaita";
-      package = pkgs.adwaita-icon-theme;
+      name = "breeze_cursors";
+      package = pkgs.kdePackages.breeze;
     };
     
     font = {
-      name = "Sans";
+      name = "Noto Sans";
       size = 11;
     };
   };
