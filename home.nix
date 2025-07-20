@@ -28,6 +28,7 @@
     
     # Python avec support des environnements virtuels
     python3 python3Packages.virtualenv python3Packages.pip
+    uv # Gestionnaire de paquets Python moderne
     
     # === ÉDITEURS ET IDE ===
     # Visual Studio Code - éditeur populaire avec extensions
@@ -48,7 +49,7 @@
     
     # === APPLICATIONS DE COMMUNICATION ===
     # Discord pour la communication gaming/développement
-    discord
+    vesktop
     
     # === MULTIMÉDIA ===
     # Spotify pour la musique en streaming
@@ -102,6 +103,8 @@
     pavucontrol   # Contrôle audio graphique
     brightnessctl # Contrôle de la luminosité
     playerctl     # Contrôle des lecteurs multimédia
+    cliphist      # Gestionnaire d'historique presse-papiers
+    wtype         # Outil de saisie Wayland
   ];
 
   # === CONFIGURATION GIT ===
@@ -244,20 +247,23 @@
     enable = true;
   };
 
-  # Gestion explicite du fichier ~/.ssh/config (Home Manager gère les permissions automatiquement)
-  home.file.".ssh/config".text = ''
-    # Sécurité renforcée
-    Host *
-      PasswordAuthentication no
-      ChallengeResponseAuthentication no
-      HashKnownHosts yes
-      VisualHostKey yes
+  # Configuration SSH avec permissions correctes pour VSCode
+  home.file.".ssh/config" = {
+    text = ''
+      # Sécurité renforcée
+      Host *
+        PasswordAuthentication no
+        ChallengeResponseAuthentication no
+        HashKnownHosts yes
+        VisualHostKey yes
 
-      # Performance
-      Compression yes
-      ServerAliveInterval 60
-      ServerAliveCountMax 3
-  '';
+        # Performance
+        Compression yes
+        ServerAliveInterval 60
+        ServerAliveCountMax 3
+    '';
+    target = ".ssh/config";
+  };
 
   # === CONFIGURATION DIRENV ===
   programs.direnv = {
@@ -267,11 +273,12 @@
   };
 
   # === CONFIGURATION HYPRLAND ===
+  # Configuration inspirée de mylinuxforwork/dotfiles
   wayland.windowManager.hyprland = {
     enable = true;
     package = inputs.hyprland.packages.${pkgs.system}.hyprland;
     
-    # Configuration de base Hyprland
+    # Configuration Hyprland avec style ML4W
     settings = {
       # === CONFIGURATION MONITEUR ===
       monitor = [
@@ -279,11 +286,14 @@
       ];
       
       # === PROGRAMMES DE DÉMARRAGE ===
+      # Inspiré de ML4W dotfiles avec applications personnalisées
       exec-once = [
         "waybar"                    # Barre de statut
-        "mako"                      # Notifications
-        "swww init"                 # Fond d'écran
-        "swayidle -w timeout 300 'swaylock' timeout 600 'hyprctl dispatch dpms off' resume 'hyprctl dispatch dpms on' before-sleep 'swaylock'"
+        "mako"                      # Notifications  
+        "swww init"                 # Fond d'écran avec support animations
+        "swayidle -w timeout 300 'swaylock-effects' timeout 600 'hyprctl dispatch dpms off' resume 'hyprctl dispatch dpms on' before-sleep 'swaylock-effects'"
+        "wl-paste --type text --watch cliphist store"    # Gestionnaire presse-papiers
+        "wl-paste --type image --watch cliphist store"   # Images presse-papiers
       ];
       
       # === CONFIGURATION ENVIRONNEMENT ===
@@ -435,9 +445,18 @@
         "$mod, mouse_down, workspace, e+1"
         "$mod, mouse_up, workspace, e-1"
         
-        # Captures d'écran
-        ", Print, exec, grim -g \"$(slurp)\" - | wl-copy"
-        "$mod, Print, exec, grim - | wl-copy"
+        # Captures d'écran (style ML4W)
+        ", Print, exec, grim -g \"$(slurp)\" - | wl-copy && notify-send 'Capture d'écran' 'Zone sélectionnée copiée'"
+        "$mod, Print, exec, grim - | wl-copy && notify-send 'Capture d'écran' 'Écran complet copié'"
+        "$mod SHIFT, S, exec, grim -g \"$(slurp)\" ~/Images/screenshot-$(date +%Y%m%d-%H%M%S).png"
+        
+        # Presse-papiers (ML4W style)
+        "$mod, V, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy"
+        
+        # Applications supplémentaires
+        "$mod, T, exec, kitty"
+        "$mod, B, exec, firefox"
+        "$mod SHIFT, E, exec, wlogout"
         
         # Contrôles multimédia
         ", XF86AudioPlay, exec, playerctl play-pause"
@@ -537,7 +556,7 @@
   programs.home-manager.enable = true;
 
   # === CONFIGURATION HOME-MANAGER ===
-  # Suppression automatique des fichiers de sauvegarde existants
+  # Suppression automatique des fichiers de sauvegarde existants et correction permissions SSH
   home.activation = {
     removeExistingBackups = config.lib.dag.entryBefore ["checkLinkTargets"] ''
       run rm -f ~/.gtkrc-2.0.hm-backup
@@ -546,6 +565,16 @@
       run rm -f ~/.zshrc.hm-backup
       run rm -f ~/.gitconfig.hm-backup
       run rm -f ~/.ssh/config.hm-backup
+    '';
+    
+    fixSshConfigPermissions = config.lib.dag.entryAfter ["linkGeneration"] ''
+      # Correction des permissions SSH pour VSCode
+      if [ -f ~/.ssh/config ]; then
+        run chmod 600 ~/.ssh/config
+      fi
+      if [ -d ~/.ssh ]; then
+        run chmod 700 ~/.ssh
+      fi
     '';
   };
 }

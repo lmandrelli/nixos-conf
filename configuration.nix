@@ -59,12 +59,18 @@
     };
   };
 
-  # KDE Plasma avec Wayland
-  services.displayManager.sddm.enable = true;
+  # GNOME Display Manager (GDM) pour l'écran de connexion
+  services.displayManager.gdm.enable = true;
+  services.displayManager.gdm.wayland = true;
+  
+  # GNOME (uniquement pour l'écran de connexion, pas comme environnement de bureau)
+  services.desktopManager.gnome.enable = true;
+  
+  # KDE Plasma avec Wayland (gardé pour compatibilité)
   services.desktopManager.plasma6.enable = true;
   
-  # Support Wayland pour les applications
-  services.displayManager.defaultSession = "plasma";
+  # Session par défaut : Hyprland
+  services.displayManager.defaultSession = "hyprland";
   
   # === CONFIGURATION AUDIO ===
   # PipeWire pour l'audio moderne avec support Wayland
@@ -256,4 +262,8 @@
 
   # === CONFIGURATION SUDO ===
   security.sudo.enable = true;
+  
+  # === RÉSOLUTION CONFLIT SSH ASKPASS ===
+  # Force l'utilisation de l'askpass GNOME pour éviter le conflit avec KDE
+  programs.ssh.askPassword = lib.mkForce "${pkgs.seahorse}/libexec/seahorse/ssh-askpass";
 }
