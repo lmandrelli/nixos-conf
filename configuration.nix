@@ -69,8 +69,8 @@
   # KDE Plasma avec Wayland (gardé pour compatibilité)
   services.desktopManager.plasma6.enable = true;
   
-  # Session par défaut : Hyprland
-  services.displayManager.defaultSession = "hyprland";
+  # Session par défaut : GNOME Wayland
+  services.displayManager.defaultSession = "gnome";
   
   # === CONFIGURATION AUDIO ===
   # PipeWire pour l'audio moderne avec support Wayland

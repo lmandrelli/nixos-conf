@@ -16,6 +16,11 @@
   # === PACKAGES UTILISATEUR ===
   # Applications et outils spécifiques à l'utilisateur
   home.packages = with pkgs; [
+    # === COMPATIBILITÉ WAYLAND/X11 ===
+    xwayland xorg.xhost
+    # Bridge X11 vers Wayland pour GNOME
+    xdg-desktop-portal-wlr
+    xdg-desktop-portal-gtk
     # === POLICES ===
     jetbrains-mono nerd-fonts.jetbrains-mono nerd-fonts.meslo-lg
 
@@ -226,7 +231,7 @@
     
     # Variables d'environnement personnalisées
     sessionVariables = {
-      EDITOR = "code"; # Éditeur par défaut
+      EDITOR = "nano"; # Éditeur par défaut
       BROWSER = "firefox"; # Navigateur par défaut
     };
     
@@ -283,25 +288,7 @@
   };
 
   # === CONFIGURATION SSH ===
-  # Configuration intégrée dans programs.ssh pour éviter les problèmes de permissions
-  programs.ssh = {
-    enable = true;
-    
-    # Configuration globale avec sécurité renforcée
-    extraConfig = ''
-      # Sécurité renforcée
-      Host *
-        PasswordAuthentication no
-        ChallengeResponseAuthentication no
-        HashKnownHosts yes
-        VisualHostKey yes
-
-        # Performance
-        Compression yes
-        ServerAliveInterval 60
-        ServerAliveCountMax 3
-    '';
-  };
+  # Pas de programs.ssh pour éviter les problèmes de permissions avec les symlinks
 
   # === CONFIGURATION DIRENV ===
   programs.direnv = {
@@ -345,6 +332,11 @@
         "QT_AUTO_SCREEN_SCALE_FACTOR,1"
         "MOZ_ENABLE_WAYLAND,1"
         "GDK_BACKEND,wayland,x11"
+        # Fix for X11 apps on Wayland
+        "XDG_SESSION_TYPE,wayland"
+        "WAYLAND_DISPLAY,wayland-1"
+        "CLUTTER_BACKEND,wayland"
+        "SDL_VIDEODRIVER,wayland"
       ];
       
       # === CONFIGURATION INPUT ===
@@ -740,5 +732,23 @@
       run rm -f ~/.ssh/config.hm-backup
     '';
     
+    # Fix SSH config permissions for VSCode - copy file instead of symlink
+    copySshConfig = let
+      sshConfigFile = pkgs.writeText "ssh-config" ''
+        # Configuration SSH pour VSCode et git
+        Host *
+          PasswordAuthentication no
+          ChallengeResponseAuthentication no
+          HashKnownHosts yes
+          VisualHostKey yes
+          Compression yes
+          ServerAliveInterval 60
+          ServerAliveCountMax 3
+      '';
+    in config.lib.dag.entryAfter ["writeBoundary"] ''
+      run mkdir -p ~/.ssh
+      run chmod 700 ~/.ssh
+      $DRY_RUN_CMD install -m600 -D ${sshConfigFile} $HOME/.ssh/config
+    '';
   };
 }
