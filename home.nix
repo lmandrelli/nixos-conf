@@ -20,7 +20,7 @@
     rustc cargo rustfmt clippy
     
     # Node.js et outils JavaScript/TypeScript
-    nodejs nodePackages.npm nodePackages.prettier
+    nodePackages.npm nodePackages.prettier
     bun # Runtime JavaScript moderne et rapide
     
     # Java Development Kit
@@ -535,4 +535,17 @@
 
   # Permet à Home Manager de gérer lui-même ses services
   programs.home-manager.enable = true;
+
+  # === CONFIGURATION HOME-MANAGER ===
+  # Suppression automatique des fichiers de sauvegarde existants
+  home.activation = {
+    removeExistingBackups = config.lib.dag.entryBefore ["checkLinkTargets"] ''
+      run rm -f ~/.gtkrc-2.0.hm-backup
+      run rm -f ~/.bashrc.hm-backup
+      run rm -f ~/.profile.hm-backup
+      run rm -f ~/.zshrc.hm-backup
+      run rm -f ~/.gitconfig.hm-backup
+      run rm -f ~/.ssh/config.hm-backup
+    '';
+  };
 }
