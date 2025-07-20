@@ -44,6 +44,12 @@
     # Claude Code - commande IA pour IDE
     claude-code
     
+    # === DÉPENDANCES MCP ===
+    # Outils requis pour les serveurs MCP
+    nil                    # LSP server pour Nix
+    rust-analyzer         # LSP server pour Rust  
+    python3Packages.python-lsp-server  # LSP server pour Python
+    
     # === TERMINAUX ===
     # Warp - terminal moderne avec IA intégrée (version stable)
     stable.warp-terminal
@@ -605,28 +611,122 @@
   programs.home-manager.enable = true;
 
   # === CONFIGURATION CLAUDE CODE MCP ===
-  # PROBLÈME: claude-code.nix flake manque pkgs.mcp-servers 
-  # Configuration temporairement désactivée - à configurer manuellement
-  # 
-  # Pour activer manuellement Claude Code MCP:
-  # 1. Installer claude-code: nix-shell -p claude-code  
-  # 2. Configurer manuellement: claude mcp add ...
-  # 3. Serveurs recommandés: git, github, sequential-thinking, time
-  # 4. Serveurs personnalisés: nixos (uvx mcp-nixos), context7 (npx -y @upstash/context7-mcp)
-  #
-  # programs.claude-code = {
-  #   enable = true;
-  #   mcp = {
-  #     git.enable = true;
-  #     github.enable = true; 
-  #     sequential-thinking.enable = true;
-  #     time.enable = true;
-  #     servers = {
-  #       nixos = { type = "stdio"; command = "uvx"; args = ["mcp-nixos"]; };
-  #       context7 = { type = "stdio"; command = "npx"; args = ["-y" "@upstash/context7-mcp"]; };
-  #     };
-  #   };
-  # };
+  # Configuration persistante des serveurs MCP pour Claude Code
+  # Les serveurs MCP sont configurés via settings.json et recréés automatiquement
+  
+  # Configuration MCP persistante dans settings.json
+  home.file.".config/claude/settings.json".text = builtins.toJSON {
+    mcpServers = {
+      # === SERVEURS OFFICIELS ===
+      
+      # GitHub MCP Server - gestion des repositories et issues
+      github = {
+        command = "npx";
+        args = ["-y" "github-mcp-server"];
+        env = {
+          GITHUB_PERSONAL_ACCESS_TOKEN = "\${GITHUB_TOKEN}";
+        };
+      };
+
+      # === SERVEURS LSP POUR L'ANALYSE DE CODE ===
+      
+      # LSP pour Nix
+      lsp-nix = {
+        command = "npx";
+        args = ["-y" "@tritlo/lsp-mcp"];
+        env = {
+          LSP_COMMAND = "nil";
+          LSP_ARGS = "";
+        };
+      };
+
+      # LSP pour Python  
+      lsp-python = {
+        command = "uvx";
+        args = ["cclsp"];
+        env = {
+          LSP_SERVERS = builtins.toJSON [{
+            extensions = ["py"];
+            command = ["uvx" "python-lsp-server"];
+            rootDir = ".";
+          }];
+        };
+      };
+
+      # LSP pour Rust
+      lsp-rust = {
+        command = "npx";
+        args = ["-y" "mcp-language-server" "--lsp" "rust-analyzer"];
+      };
+
+      # LSP pour TypeScript
+      lsp-typescript = {
+        command = "npx"; 
+        args = ["-y" "@tritlo/lsp-mcp"];
+        env = {
+          LSP_COMMAND = "npx";
+          LSP_ARGS = "typescript-language-server --stdio";
+        };
+      };
+
+      # === SERVEURS UTILITAIRES ===
+      
+      # Sequential Thinking - réflexion structurée
+      sequential-thinking = {
+        command = "npx";
+        args = ["-y" "@modelcontextprotocol/server-sequential-thinking"];
+      };
+
+      # Time - informations temporelles
+      time = {
+        command = "npx";
+        args = ["-y" "time-mcp"];
+      };
+
+      # === SERVEURS PERSONNALISÉS ===
+      
+      # NixOS - recherche de packages et options  
+      nixos = {
+        command = "uvx";
+        args = ["mcp-nixos"];
+      };
+
+      # Context7 - documentation à jour
+      Context7 = {
+        command = "npx";
+        args = ["-y" "@upstash/context7-mcp"];
+      };
+    };
+  };
+
+  # === GESTION SÉCURISÉE DU TOKEN GITHUB ===
+  # Script pour créer le fichier d'environnement avec le token GitHub
+  home.file.".config/claude/github-token.sh" = {
+    text = ''
+      #!/bin/bash
+      # Script de configuration du token GitHub pour Claude Code MCP
+      # Usage: ./github-token.sh <your-github-token>
+      
+      if [ -z "$1" ]; then
+        echo "Usage: $0 <github-personal-access-token>"
+        echo "Créez un token avec les permissions: repo, read:packages"
+        exit 1
+      fi
+      
+      TOKEN_FILE="$HOME/.config/claude/.env"
+      echo "GITHUB_TOKEN=$1" > "$TOKEN_FILE"
+      chmod 600 "$TOKEN_FILE"
+      echo "Token GitHub configuré dans $TOKEN_FILE"
+      echo "Permissions du fichier: $(ls -la "$TOKEN_FILE")"
+    '';
+    executable = true;
+  };
+
+  # Variables d'environnement pour Claude Code
+  home.sessionVariables = {
+    # Assurer que les chemins Nix sont disponibles pour MCP
+    MCP_PATH = "${config.home.homeDirectory}/.config/claude";
+  };
 
   # === CONFIGURATION HOME-MANAGER ===
   # Suppression automatique des fichiers de sauvegarde existants et correction permissions SSH
