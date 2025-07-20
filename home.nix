@@ -2,6 +2,10 @@
 { config, pkgs, inputs, ... }:
 
 {
+  # Imports des modules
+  imports = [
+    # Aucun module externe pour le moment
+  ];
   # === INFORMATIONS UTILISATEUR ===
   home = {
     username = "lmandrelli";
@@ -91,6 +95,13 @@
     # Outils Git avancés
     git-lfs gh # GitHub CLI
     
+    # === OUTILS DOCKER ===
+    # Docker et outils de conteneurisation
+    docker-compose     # Orchestration multi-conteneurs
+    lazydocker        # Interface TUI pour Docker
+    dive              # Analyse des couches d'images Docker
+    ctop              # Monitoring des conteneurs en temps réel
+    
     # === HYPRLAND ECOSYSTEM ===
     waybar        # Barre de statut personnalisable
     wofi          # Lanceur d'applications style rofi
@@ -105,6 +116,13 @@
     playerctl     # Contrôle des lecteurs multimédia
     cliphist      # Gestionnaire d'historique presse-papiers
     wtype         # Outil de saisie Wayland
+    
+    # Outils ML4W-inspired pour Hyprland
+    hypridle      # Gestion de l'inactivité Hyprland
+    hyprlock      # Écran de verrouillage Hyprland
+    hyprpicker    # Sélecteur de couleurs
+    hyprshot      # Screenshots optimisés Hyprland
+    wl-clipboard-rs # Gestionnaire presse-papiers Rust
   ];
 
   # === CONFIGURATION GIT ===
@@ -176,6 +194,9 @@
       # Roo Code
       ".roo"
       ".roorules"
+
+      "CLAUDE.md"
+      ".claude"
     ];
   };
 
@@ -223,6 +244,19 @@
       nrt = "sudo nixos-rebuild test --flake .";
       hms = "home-manager switch --flake .";
       
+      # Docker raccourcis
+      d = "docker";
+      dc = "docker-compose";
+      dps = "docker ps";
+      dpa = "docker ps -a";
+      di = "docker images";
+      dl = "docker logs";
+      de = "docker exec -it";
+      dr = "docker run";
+      ds = "docker stop";
+      drm = "docker rm";
+      drmi = "docker rmi";
+      
       # Navigation rapide
       ".." = "cd ..";
       "..." = "cd ../..";
@@ -243,13 +277,12 @@
   };
 
   # === CONFIGURATION SSH ===
+  # Configuration intégrée dans programs.ssh pour éviter les problèmes de permissions
   programs.ssh = {
     enable = true;
-  };
-
-  # Configuration SSH avec permissions correctes pour VSCode
-  home.file.".ssh/config" = {
-    text = ''
+    
+    # Configuration globale avec sécurité renforcée
+    extraConfig = ''
       # Sécurité renforcée
       Host *
         PasswordAuthentication no
@@ -262,7 +295,6 @@
         ServerAliveInterval 60
         ServerAliveCountMax 3
     '';
-    target = ".ssh/config";
   };
 
   # === CONFIGURATION DIRENV ===
@@ -297,9 +329,16 @@
       ];
       
       # === CONFIGURATION ENVIRONNEMENT ===
+      # Variables d'environnement inspirées de ML4W
       env = [
         "XCURSOR_SIZE,24"
         "HYPRCURSOR_SIZE,24"
+        "QT_QPA_PLATFORM,wayland"
+        "QT_QPA_PLATFORMTHEME,qt5ct"
+        "QT_WAYLAND_DISABLE_WINDOWDECORATION,1"
+        "QT_AUTO_SCREEN_SCALE_FACTOR,1"
+        "MOZ_ENABLE_WAYLAND,1"
+        "GDK_BACKEND,wayland,x11"
       ];
       
       # === CONFIGURATION INPUT ===
@@ -320,41 +359,51 @@
       };
       
       # === CONFIGURATION GÉNÉRALE ===
+      # Améliorations inspirées de ML4W
       general = {
-        gaps_in = 5;
-        gaps_out = 20;
+        gaps_in = 6;
+        gaps_out = 12;
         border_size = 2;
         
-        # Couleurs des bordures (thème sombre moderne)
-        "col.active_border" = "rgba(33ccffee) rgba(00ff99ee) 45deg";
-        "col.inactive_border" = "rgba(595959aa)";
+        # Couleurs des bordures (style ML4W moderne)
+        "col.active_border" = "rgba(ca9ee6ff) rgba(f2d5cfff) 45deg";
+        "col.inactive_border" = "rgba(b4befecc) rgba(6c7086cc) 45deg";
         
-        resize_on_border = false;
+        resize_on_border = true;
         allow_tearing = false;
+        no_border_on_floating = false;
         
         layout = "dwindle";
       };
       
       # === CONFIGURATION DÉCORATION ===
+      # Décorations améliorées style ML4W
       decoration = {
-        rounding = 10;
+        rounding = 12;
         
         active_opacity = 1.0;
-        inactive_opacity = 1.0;
+        inactive_opacity = 0.95;
+        fullscreen_opacity = 1.0;
         
         drop_shadow = true;
-        shadow_range = 4;
+        shadow_range = 6;
         shadow_render_power = 3;
-        "col.shadow" = "rgba(1a1a1aee)";
+        "col.shadow" = "rgba(181825aa)";
+        "col.shadow_inactive" = "rgba(181825dd)";
         
-        # Effets de flou moderne
+        # Effets de flou avancés
         blur = {
           enabled = true;
-          size = 3;
-          passes = 1;
-          
+          size = 5;
+          passes = 3;
+          ignore_opacity = true;
+          new_optimizations = true;
           vibrancy = 0.1696;
         };
+        
+        # Dim des fenêtres inactives
+        dim_inactive = true;
+        dim_strength = 0.1;
       };
       
       # === CONFIGURATION ANIMATIONS ===
@@ -555,6 +604,30 @@
   # Permet à Home Manager de gérer lui-même ses services
   programs.home-manager.enable = true;
 
+  # === CONFIGURATION CLAUDE CODE MCP ===
+  # PROBLÈME: claude-code.nix flake manque pkgs.mcp-servers 
+  # Configuration temporairement désactivée - à configurer manuellement
+  # 
+  # Pour activer manuellement Claude Code MCP:
+  # 1. Installer claude-code: nix-shell -p claude-code  
+  # 2. Configurer manuellement: claude mcp add ...
+  # 3. Serveurs recommandés: git, github, sequential-thinking, time
+  # 4. Serveurs personnalisés: nixos (uvx mcp-nixos), context7 (npx -y @upstash/context7-mcp)
+  #
+  # programs.claude-code = {
+  #   enable = true;
+  #   mcp = {
+  #     git.enable = true;
+  #     github.enable = true; 
+  #     sequential-thinking.enable = true;
+  #     time.enable = true;
+  #     servers = {
+  #       nixos = { type = "stdio"; command = "uvx"; args = ["mcp-nixos"]; };
+  #       context7 = { type = "stdio"; command = "npx"; args = ["-y" "@upstash/context7-mcp"]; };
+  #     };
+  #   };
+  # };
+
   # === CONFIGURATION HOME-MANAGER ===
   # Suppression automatique des fichiers de sauvegarde existants et correction permissions SSH
   home.activation = {
@@ -567,14 +640,5 @@
       run rm -f ~/.ssh/config.hm-backup
     '';
     
-    fixSshConfigPermissions = config.lib.dag.entryAfter ["linkGeneration"] ''
-      # Correction des permissions SSH pour VSCode
-      if [ -f ~/.ssh/config ]; then
-        run chmod 600 ~/.ssh/config
-      fi
-      if [ -d ~/.ssh ]; then
-        run chmod 700 ~/.ssh
-      fi
-    '';
   };
 }

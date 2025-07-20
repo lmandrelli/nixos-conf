@@ -125,6 +125,7 @@
       "video"         # Accès vidéo/caméra
       "input"         # Périphériques d'entrée
       "storage"       # Stockage
+      "docker"        # Accès Docker
     ];
     shell = pkgs.zsh; # Shell par défaut
   };
@@ -187,6 +188,22 @@
   
   # SSH pour l'accès distant
   services.openssh.enable = true;
+  
+  # === CONFIGURATION DOCKER ===
+  # Docker pour la conteneurisation
+  virtualisation.docker = {
+    enable = true;
+    enableOnBoot = true;
+    
+    # Configuration recommandée pour les performances
+    storageDriver = "overlay2";
+    
+    # Support rootless Docker (optionnel, plus sécurisé)
+    rootless = {
+      enable = true;
+      setSocketVariable = true;
+    };
+  };
   
   # === CONFIGURATION HYPRLAND ===
   # Gestionnaire de fenêtres Wayland moderne

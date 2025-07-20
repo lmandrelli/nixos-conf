@@ -22,6 +22,7 @@
       url = "github:hyprwm/Hyprland";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    
   };
 
   outputs = { self, nixpkgs, nixpkgs-stable, home-manager, nixos-hardware, hyprland, ... }@inputs: {
