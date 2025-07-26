@@ -134,18 +134,23 @@
     hyprpicker    # Sélecteur de couleurs
     hyprshot      # Screenshots optimisés Hyprland
     wl-clipboard-rs # Gestionnaire presse-papiers Rust
+    
+    # === APPIMAGE SUPPORT ===
+    appimage-run  # Nécessaire pour exécuter les AppImages sur NixOS
   ];
 
   # === GESTION DES APPIMAGES ===
+
+
   # Création du fichier .desktop pour Cider AppImage
   home.file.".local/share/applications/cider.desktop" = {
     text = ''
       [Desktop Entry]
       Type=Application
       Name=Cider
-      Comment=Apple Music client alternatif
+      Comment=Client Apple Music alternatif
       Exec=${config.home.homeDirectory}/.local/bin/appimages/cider.AppImage
-      Icon=multimedia-audio-player
+      Icon=${config.home.homeDirectory}/.local/share/icons/cider.svg
       Categories=AudioVideo;Audio;Player;
       StartupNotify=true
       StartupWMClass=cider

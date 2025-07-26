@@ -295,6 +295,13 @@
   # Zsh comme shell par défaut
   programs.zsh.enable = true;
 
+  # === CONFIGURATION APPIMAGE ===
+  # Support natif des AppImages avec binfmt
+  programs.appimage = {
+    enable = true;
+    binfmt = true;  # Permet d'exécuter les AppImages directement
+  };
+
   # === VERSION SYSTÈME ===
   # Version de NixOS (ne pas modifier)
   system.stateVersion = "25.05"; # Changez selon votre version d'installation
