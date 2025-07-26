@@ -72,8 +72,6 @@
     # Spotify pour la musique en streaming
     spotify
     
-    # Cider - client Apple Music alternatif
-    cider
     
     # VLC - lecteur multimédia universel
     vlc
@@ -137,6 +135,27 @@
     hyprshot      # Screenshots optimisés Hyprland
     wl-clipboard-rs # Gestionnaire presse-papiers Rust
   ];
+
+  # === GESTION DES APPIMAGES ===
+  # Création du fichier .desktop pour Cider AppImage
+  home.file.".local/share/applications/cider.desktop" = {
+    text = ''
+      [Desktop Entry]
+      Type=Application
+      Name=Cider
+      Comment=Apple Music client alternatif
+      Exec=${config.home.homeDirectory}/.local/bin/appimages/cider.AppImage
+      Icon=multimedia-audio-player
+      Categories=AudioVideo;Audio;Player;
+      StartupNotify=true
+      StartupWMClass=cider
+      MimeType=audio/mpeg;audio/flac;audio/ogg;audio/mp4;
+      Keywords=music;audio;player;apple;streaming;
+    '';
+  };
+  
+  # S'assurer que le répertoire AppImages existe
+  home.file.".local/bin/appimages/.keep".text = "";
 
   # === CONFIGURATION GIT ===
   programs.git = {

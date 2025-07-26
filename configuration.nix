@@ -271,6 +271,9 @@
     
     # Navigateur de secours
     firefox
+    
+    # AppImage support
+    appimage-run
   ];
 
   # === SERVICES SPÉCIALISÉS ===
