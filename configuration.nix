@@ -72,6 +72,9 @@
   services.displayManager.gdm.enable = true;
   services.displayManager.gdm.wayland = true;
   
+  # Configuration Num Lock pour l'affichage de connexion
+  services.displayManager.sddm.autoNumlock = true;
+  
   # KDE Plasma 6 avec Wayland
   services.desktopManager.plasma6.enable = true;
   
