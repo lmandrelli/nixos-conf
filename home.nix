@@ -48,18 +48,11 @@
     # Zed - éditeur moderne écrit en Rust
     zed-editor
 
-    # Claude Code - commande IA pour IDE
-    claude-code
-    
-    # === DÉPENDANCES MCP ===
-    # Outils requis pour les serveurs MCP
-    nil                    # LSP server pour Nix
-    rust-analyzer         # LSP server pour Rust  
-    python3Packages.python-lsp-server  # LSP server pour Python
+    opencode
     
     # === TERMINAUX ===
-    # Warp - terminal moderne avec IA intégrée (version stable)
-    stable.warp-terminal
+    # Warp - terminal moderne avec IA intégrée
+    warp-terminal
     
     # Kitty - terminal rapide avec support GPU
     kitty
@@ -228,12 +221,7 @@
       "*~"
       ".*.sw[a-z]"
 
-      # Roo Code
-      ".roo"
-      ".roorules"
-
-      "CLAUDE.md"
-      ".claude"
+      "AGENTS.md"
     ];
   };
 
