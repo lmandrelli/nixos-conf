@@ -315,4 +315,6 @@
   # === CONFIGURATION SSH ASKPASS ===
   # Utilise l'askpass KDE pour une meilleure intégration
   programs.ssh.askPassword = lib.mkForce "${pkgs.kdePackages.ksshaskpass}/bin/ksshaskpass";
+
+  nixpkgs.config.android_sdk.accept_license = true;
 }

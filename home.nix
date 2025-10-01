@@ -132,6 +132,9 @@
     appimage-run  # Nécessaire pour exécuter les AppImages sur NixOS
 
     typst
+
+    android-studio-full
+    android-tools
   ];
 
   # === GESTION DES APPIMAGES ===
