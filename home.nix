@@ -24,7 +24,11 @@
     # Num Lock control
     numlockx
     # === POLICES ===
-    jetbrains-mono nerd-fonts.jetbrains-mono nerd-fonts.meslo-lg
+    jetbrains-mono 
+    nerd-fonts.jetbrains-mono 
+    nerd-fonts.meslo-lg
+    corefonts
+    vista-fonts
 
     # === DÉVELOPPEMENT ===
     # Rust et son écosystème
@@ -50,6 +54,7 @@
 
     opencode
     lmstudio
+    gemini-cli
     
     # === TERMINAUX ===
     # Warp - terminal moderne avec IA intégrée
