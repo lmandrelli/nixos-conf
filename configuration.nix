@@ -211,6 +211,16 @@
   # SSH pour l'accès distant
   services.openssh.enable = true;
   
+  # Open WebUI service
+  services.open-webui = {
+    enable = true;
+    host = "127.0.0.1";
+    port = 8080;
+    environment = {
+      WEBUI_AUTH = "False";
+    };
+  };
+  
   # === CONFIGURATION DOCKER ===
   # Docker pour la conteneurisation
   virtualisation.docker = {
