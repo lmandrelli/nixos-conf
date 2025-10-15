@@ -142,6 +142,35 @@
     typst
     tinymist
 
+    # LaTeX distribution with pdflatex, biblatex and common packages
+    (texlive.withPackages (ps: with ps; [
+      scheme-full
+      # Bibliography and citation
+      biblatex biber
+      # Font collections
+      collection-fontsrecommended
+      collection-fontutils
+      # Math and science
+      amsmath amsfonts
+      # Graphics and figures
+      graphics float subfig
+      # Page layout and formatting
+      geometry fancyhdr hyperref
+      microtype booktabs nicematrix
+      # Lists and enumeration
+      enumitem
+      # Code listings
+      listings
+      # Colors
+      xcolor
+      # Additional useful packages
+      pgf pgfplots beamer
+      # Language support
+      collection-langenglish
+      # Extra packages
+      collection-latexextra
+    ]))
+
     android-studio-full
     android-tools
   ];
