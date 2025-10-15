@@ -55,6 +55,7 @@
     opencode
     lmstudio
     gemini-cli
+    jan
     
     # === TERMINAUX ===
     # Warp - terminal moderne avec IA intégrée
