@@ -41,7 +41,6 @@
                   config.allowUnfree = true;
                 };
               })
-              (import "${self}/overlays/opencode.nix")
             ];
           })
           # Configuration matérielle générée automatiquement
